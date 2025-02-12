@@ -16,7 +16,7 @@ class TreeNode {
     TreeNode right;
 }
 
-class Traversal {
+public class Traversal {
     public List<Integer> preorderTraversal(TreeNode root) {
         List<Integer> result = new ArrayList<>();
         if (root == null) {
