@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * @time 2025-02-12 14:51
  * @description ...
  */
-public class LeekCode343 {
+class LeekCode343 {
     public int integerBreak(int n) {
         int[] dp = new int[n + 1];
         dp[2] = 1;
