@@ -7,12 +7,6 @@ import java.util.*;
  * @time 2025-02-12 10:38 PM
  * @description ...
  */
-class TreeNode {
-    int val;
-    TreeNode left;
-    TreeNode right;
-}
-
 class Traversal {
     public List<Integer> preorderTraversal(TreeNode root) {
         List<Integer> result = new ArrayList<>();
