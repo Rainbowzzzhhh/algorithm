@@ -180,3 +180,42 @@ class LayerTraversal {
         }
     }
 }
+
+class InvertTree{
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) return root;
+        invertTree(root.left);
+        invertTree(root.right);
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        return root;
+    }
+
+    public TreeNode invertTreeFor(TreeNode root) {
+        if(root == null) return root;
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        stack.push(root);
+        while (!stack.isEmpty()){
+            TreeNode node = stack.peek();
+            if (node != null){
+                stack.pop();
+                if(node.right != null) stack.push(node.right);
+                if(node.left != null) stack.push(node.left);
+                stack.push(node);
+                stack.push(null);//空指针做标记
+            }
+            else {
+                stack.pop();//弹出空
+                node = stack.pop();
+                process(node);
+            }
+        }
+        return root;
+    }
+    private void process(TreeNode node){
+        TreeNode temp = node.left;
+        node.left = node.right;
+        node.right = temp;
+    }
+}
