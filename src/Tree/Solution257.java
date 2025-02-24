@@ -41,7 +41,6 @@ public class Solution257 {
         if (node.right != null) {
             backTracing(node.right);
         }
-
         temp.removeLast();  //回溯，撤销处理结果
     }
 }
