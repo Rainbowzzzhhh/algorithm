@@ -146,32 +146,38 @@ class LayerTraversal {
     public void checkFun01(TreeNode node, Integer deep) {
         if (node == null) return;
         deep++;
+
         if (resList.size() < deep) {
             List<Integer> arrayList = new ArrayList<>();
             resList.add(arrayList);
         }
         resList.get(deep-1).add(node.val);
+
         checkFun01(node.left,deep);
         checkFun01(node.right,deep);
     }
 
-    public void checkFun02(TreeNode root) {
-        if (root == null) return;
-        Queue<TreeNode> queue = new LinkedList<>();
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            List<Integer> arrayList = new ArrayList<>();
-            int len = queue.size();
-            while (len > 0) {
-                TreeNode node = queue.poll();
-                arrayList.add(node.val);
+    public void checkFun02(TreeNode node) {
+        if (node == null) return;
+        Queue<TreeNode> que = new LinkedList<TreeNode>();
+        que.offer(node);
 
-                queue.offer(node.left);
-                queue.offer(node.right);
+        while (!que.isEmpty()) {
+            List<Integer> itemList = new ArrayList<Integer>();
+            int len = que.size();
+
+            while (len > 0) {
+                TreeNode tmpNode = que.poll();
+                itemList.add(tmpNode.val);
+
+                if (tmpNode.left != null) que.offer(tmpNode.left);
+                if (tmpNode.right != null) que.offer(tmpNode.right);
                 len--;
             }
-            resList.add(arrayList);
+
+            resList.add(itemList);
         }
+
     }
 }
 
