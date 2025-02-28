@@ -126,5 +126,9 @@ public class Main {
 }
 ```
 
-
+# dijkstra算法：在有权图（权值非负数）中求从起点到其他节点的最短路径算法
+https://programmercarl.com/kamacoder/0047.%E5%8F%82%E4%BC%9Adijkstra%E6%9C%B4%E7%B4%A0.html#%E6%80%9D%E8%B7%AF
+- 第一步，选源点到哪个节点近且该节点未被访问过
+- 第二步，该最近节点被标记访问过
+- 第三步，更新非访问节点到源点的距离（即更新minDist数组）
 
