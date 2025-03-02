@@ -1,6 +1,4 @@
-# 并查集理论基础
-
-https://programmercarl.com/kamacoder/%E5%9B%BE%E8%AE%BA%E5%B9%B6%E6%9F%A5%E9%9B%86%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80.html#%E5%B9%B6%E6%9F%A5%E9%9B%86%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80
+# [并查集理论基础](https://programmercarl.com/kamacoder/%E5%9B%BE%E8%AE%BA%E5%B9%B6%E6%9F%A5%E9%9B%86%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80.html#%E5%B9%B6%E6%9F%A5%E9%9B%86%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80)
 
 - 当我们需要判断两个元素是否在同一个集合里的时候，我们就要想到用并查集。
 - father[A]=B father[B]=C,father数组初始化的时候要 father[i] = i，默认自己指向自己。
@@ -71,9 +69,7 @@ public class UnionFind {
 }
 ```
 
-# 拓扑排序精讲:给出一个<u>有向图</u>，把这个有向图转成线性的排序就叫拓扑排序。
-
-https://programmercarl.com/kamacoder/0117.%E8%BD%AF%E4%BB%B6%E6%9E%84%E5%BB%BA.html#%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E7%9A%84%E8%83%8C%E6%99%AF
+# [拓扑排序精讲:给出一个<u>有向图</u>，把这个有向图转成线性的排序就叫拓扑排序。](https://programmercarl.com/kamacoder/0117.%E8%BD%AF%E4%BB%B6%E6%9E%84%E5%BB%BA.html#%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E7%9A%84%E8%83%8C%E6%99%AF)
 
 - 拓扑排序也是图论中判断有向无环图的常用方法。
 - 其实只要能在把<u>有向无环图</u>进行<u>线性排序</u>的算法 都可以叫做 拓扑排序。
@@ -136,147 +132,9 @@ public class Main {
 }
 ```
 
-# dijkstra算法：在有权图（权值非负数）中求从起点到其他节点的最短路径算法
-
-https://programmercarl.com/kamacoder/0047.%E5%8F%82%E4%BC%9Adijkstra%E6%9C%B4%E7%B4%A0.html#%E6%80%9D%E8%B7%AF
-
-- 第一步，选源点到哪个节点近且该节点未被访问过
-- 第二步，该最近节点被标记访问过
-- 第三步，更新非访问节点到源点的距离（即更新minDist数组）
-
-## 朴素版
-```java
-public class Main {
-    public static void main(String[] args) {
-        
-        int[][] grid = new int[n + 1][n + 1];   //不适用位置0
-        
-        int start = 1;
-        int end = n;
-
-        // 存储从源点到每个节点的最短距离
-        int[] minDist = new int[n + 1];
-        Arrays.fill(minDist, Integer.MAX_VALUE);
-
-        // 记录顶点是否被访问过
-        boolean[] visited = new boolean[n + 1];
-
-        minDist[start] = 0;  // 起始点到自身的距离为0
-
-        for (int i = 1; i <= n; i++) { // 遍历所有节点
-
-            int minVal = Integer.MAX_VALUE;
-            int cur = 1;
-
-            // 1、选距离源点最近且未访问过的节点
-            for (int v = 1; v <= n; ++v) {
-                if (!visited[v] && minDist[v] < minVal) {
-                    minVal = minDist[v];
-                    cur = v;
-                }
-            }
-
-            visited[cur] = true;  // 2、标记该节点已被访问
-
-            // 3、第三步，更新非访问节点到源点的距离（即更新minDist数组）
-            for (int v = 1; v <= n; v++) {
-                if (!visited[v] 
-                        && grid[cur][v] != Integer.MAX_VALUE 
-                        && minDist[cur] + grid[cur][v] < minDist[v]) {
-                    minDist[v] = minDist[cur] + grid[cur][v];
-                }
-            }
-        }
-
-        if (minDist[end] == Integer.MAX_VALUE) {
-            System.out.println(-1); // 不能到达终点
-        } else {
-            System.out.println(minDist[end]); // 到达终点最短路径
-        }
-    }
-}
-```
-
-## 堆优化版
-```java
-class Edge {
-    int to;  // 邻接顶点
-    int val; // 边的权重
-
-    Edge(int to, int val) {
-        this.to = to;
-        this.val = val;
-    }
-}
-class MyComparison implements Comparator<Pair<Integer, Integer>> {
-    @Override
-    public int compare(Pair<Integer, Integer> lhs, Pair<Integer, Integer> rhs) {
-        return Integer.compare(lhs.second, rhs.second);
-    }
-}
-class Pair<U, V> {
-    public final U first;
-    public final V second;
-
-    public Pair(U first, V second) {
-        this.first = first;
-        this.second = second;
-    }
-}
-public class Main {
-    public static void main(String[] args) {
-        int start = 1;  // 起点
-        int end = n;    // 终点
-
-        // 存储从源点到每个节点的最短距离
-        int[] minDist = new int[n + 1];
-        Arrays.fill(minDist, Integer.MAX_VALUE);
-
-        // 记录顶点是否被访问过
-        boolean[] visited = new boolean[n + 1];
-
-        // 优先队列中存放 Pair<节点，源点到该节点的权值>
-        PriorityQueue<Pair<Integer, Integer>> pq = new PriorityQueue<>(new MyComparison());
-
-        // 初始化队列，源点到源点的距离为0，所以初始为0
-        pq.add(new Pair<>(start, 0));
-
-        minDist[start] = 0;  // 起始点到自身的距离为0
-
-        while (!pq.isEmpty()) {
-            // 1. 第一步，选源点到哪个节点近且该节点未被访问过（通过优先级队列来实现）
-            // <节点， 源点到该节点的距离>
-            Pair<Integer, Integer> cur = pq.poll();
-
-            if (visited[cur.first]) continue;
-
-            // 2. 第二步，该最近节点被标记访问过
-            visited[cur.first] = true;
-
-            // 3. 第三步，更新非访问节点到源点的距离（即更新minDist数组）
-            for (Edge edge : grid.get(cur.first)) { // 遍历 cur指向的节点，cur指向的节点为 edge
-                // cur指向的节点edge.to，这条边的权值为 edge.val
-                if (!visited[edge.to] && minDist[cur.first] + edge.val < minDist[edge.to]) { // 更新minDist
-                    minDist[edge.to] = minDist[cur.first] + edge.val;
-                    pq.add(new Pair<>(edge.to, minDist[edge.to]));
-                }
-            }
-        }
-
-        if (minDist[end] == Integer.MAX_VALUE) {
-            System.out.println(-1); // 不能到达终点
-        } else {
-            System.out.println(minDist[end]); // 到达终点最短路径
-        }
-    }
-}
-```
-
 # 最小生成树：所有节点的最小连通子图，即：以最小的成本（边的权值）将图中所有节点链接到一起
 
-## prim（节点）：
-
-https://programmercarl.com/kamacoder/0053.%E5%AF%BB%E5%AE%9D-prim.html#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF
+## [prim（节点）](https://programmercarl.com/kamacoder/0053.%E5%AF%BB%E5%AE%9D-prim.html#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF)
 
 - prim算法是从节点的角度采用贪心的策略每次寻找距离最小生成树最近的节点并加入到最小生成树中。
 
@@ -351,6 +209,294 @@ public class Main {
     }
 }
 ```
+
+# 最短路径算法：
+
+# [dijkstra算法：在有权图（权值非负数）中求从起点到其他节点的最短路径算法](https://programmercarl.com/kamacoder/0047.%E5%8F%82%E4%BC%9Adijkstra%E6%9C%B4%E7%B4%A0.html#%E6%80%9D%E8%B7%AF)
+
+- 贪心：每次选取离源点最近的点
+- 第一步，选源点到哪个节点近且该节点未被访问过
+- 第二步，该最近节点被标记访问过
+- 第三步，更新非访问节点到源点的距离（即更新minDist数组）
+
+## 朴素版
+
+```java
+public class Main {
+    public static void main(String[] args) {
+
+        int[][] grid = new int[n + 1][n + 1];   //不适用位置0
+
+        int start = 1;
+        int end = n;
+
+        // 存储从源点到每个节点的最短距离
+        int[] minDist = new int[n + 1];
+        Arrays.fill(minDist, Integer.MAX_VALUE);
+
+        // 记录顶点是否被访问过
+        boolean[] visited = new boolean[n + 1];
+
+        minDist[start] = 0;  // 起始点到自身的距离为0
+
+        for (int i = 1; i <= n; i++) { // 遍历所有节点
+
+            int minVal = Integer.MAX_VALUE;
+            int cur = 1;
+
+            // 1、！！！选距离源点最近且未访问过的节点
+            for (int v = 1; v <= n; ++v) {
+                if (!visited[v] && minDist[v] < minVal) {
+                    minVal = minDist[v];
+                    cur = v;
+                }
+            }
+
+            visited[cur] = true;  // 2、标记该节点已被访问
+
+            // 3、第三步，更新非访问节点到源点的距离（即更新minDist数组）
+            for (int v = 1; v <= n; v++) {
+                if (!visited[v]
+                        && grid[cur][v] != Integer.MAX_VALUE    //有边
+                        && minDist[cur] + grid[cur][v] < minDist[v]) {  //更新minDist数组，便于后面选取离源点最近的节点
+                    minDist[v] = minDist[cur] + grid[cur][v];
+                }
+            }
+        }
+
+        if (minDist[end] == Integer.MAX_VALUE) {
+            System.out.println(-1); // 不能到达终点
+        } else {
+            System.out.println(minDist[end]); // 到达终点最短路径
+        }
+    }
+}
+```
+
+## 堆优化版
+
+```java
+class Edge {
+    int to;  // 邻接顶点
+    int val; // 边的权重
+
+    Edge(int to, int val) {
+        this.to = to;
+        this.val = val;
+    }
+}
+
+class MyComparison implements Comparator<Pair<Integer, Integer>> {
+    @Override
+    public int compare(Pair<Integer, Integer> lhs, Pair<Integer, Integer> rhs) {
+        return Integer.compare(lhs.second, rhs.second);
+    }
+}
+
+class Pair<U, V> {
+    public final U first;
+    public final V second;
+
+    public Pair(U first, V second) {
+        this.first = first;
+        this.second = second;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        int start = 1;  // 起点
+        int end = n;    // 终点
+
+        // 存储从源点到每个节点的最短距离
+        int[] minDist = new int[n + 1];
+        Arrays.fill(minDist, Integer.MAX_VALUE);
+
+        // 记录顶点是否被访问过
+        boolean[] visited = new boolean[n + 1];
+
+        // ！！！优先队列中存放 Pair<节点，源点到该节点的权值>，可以自动排序队列内 源点到该节点的权值，每次队列顶都是离源点最近的
+        PriorityQueue<Pair<Integer, Integer>> pq = new PriorityQueue<>(new MyComparison());
+
+        // 初始化队列，源点到源点的距离为0，所以初始为0
+        pq.add(new Pair<>(start, 0));
+
+        minDist[start] = 0;  // 起始点到自身的距离为0
+
+        while (!pq.isEmpty()) {
+            // 1. 第一步，选源点到哪个节点近且该节点未被访问过（通过优先级队列来实现）
+            // <节点， 源点到该节点的距离>
+            Pair<Integer, Integer> cur = pq.poll();
+
+            if (visited[cur.first]) continue;   //处理不是最近的但是被加入pq的pair
+
+            // 2. 第二步，该最近节点被标记访问过
+            visited[cur.first] = true;
+
+            // 3. 第三步，更新非访问节点到源点的距离（即更新minDist数组）
+            for (Edge edge : grid.get(cur.first)) { // 遍历 cur指向的所有节点，cur指向的节点为 edge
+                // cur指向的节点edge.to，这条边的权值为 edge.val
+                if (!visited[edge.to] && minDist[cur.first] + edge.val < minDist[edge.to]) { // 更新minDist
+                    minDist[edge.to] = minDist[cur.first] + edge.val;
+                    pq.add(new Pair<>(edge.to, minDist[edge.to]));
+                }
+            }
+        }
+
+        if (minDist[end] == Integer.MAX_VALUE) {
+            System.out.println(-1); // 不能到达终点
+        } else {
+            System.out.println(minDist[end]); // 到达终点最短路径
+        }
+    }
+}
+```
+
+# [Bellman_ford 算法精讲](https://programmercarl.com/kamacoder/0094.%E5%9F%8E%E5%B8%82%E9%97%B4%E8%B4%A7%E7%89%A9%E8%BF%90%E8%BE%93I.html#%E6%80%9D%E8%B7%AF)
+
+- 使用了动态规划的思想(松弛机制)：从所有可以到达B节点的路径中，选择最小的最为其本身的状态
+- 依然是单源最短路问题，求从<u>节点1到节点n</u>的最小费用。 但本题不同之处在于<u>边的权值是有负数</u>了。
+- Bellman_ford算法的核心思想是 对所有边进行松弛n-1次操作（n为节点数量），从而求得目标最短路。
+- 如果 通过 A 到 B 这条边可以获得更短的到达B节点的路径，即如果 minDist[B] > minDist[A] + value，那么我们就更新
+  minDist[B] = minDist[A] + value ，这个过程就叫做 “松弛” 。
+
+## 原始版
+
+```java
+public class Main {
+
+    // Define an inner class Edge
+    static class Edge {
+        int from;
+        int to;
+        int val;
+
+        public Edge(int from, int to, int val) {
+            this.from = from;
+            this.to = to;
+            this.val = val;
+        }
+    }
+
+    public static void main(String[] args) {
+        // Input processing
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        List<Edge> edges = new ArrayList<>();
+
+        for (int i = 0; i < m; i++) {
+            int from = sc.nextInt();
+            int to = sc.nextInt();
+            int val = sc.nextInt();
+            edges.add(new Edge(from, to, val));
+        }
+
+        // Represents the minimum distance from the current node to the original node
+        int[] minDist = new int[n + 1];
+
+        // Initialize the minDist array
+        Arrays.fill(minDist, Integer.MAX_VALUE);
+        minDist[1] = 0;
+
+        // Starts the loop to RELAX all edges n - 1 times to update minDist array
+        for (int i = 1; i < n; i++) {
+
+            for (Edge edge : edges) {
+                // Updates the minDist array
+                if (minDist[edge.from] != Integer.MAX_VALUE && (minDist[edge.from] + edge.val) < minDist[edge.to]) {
+                    minDist[edge.to] = minDist[edge.from] + edge.val;
+                }
+            }
+        }
+
+        // Outcome printing
+        if (minDist[n] == Integer.MAX_VALUE) {
+            System.out.println("unconnected");
+        } else {
+            System.out.println(minDist[n]);
+        }
+    }
+}
+
+```
+
+## 队列优化算法（SPFA）
+
+- 只需要对<u>上一次松弛的时候更新过的节点作为出发节点所连接的边</u>进行松弛就够了。
+- 在有环且只有正权回路的情况下，即使元素重复加入队列，最后，也会因为 所有边都松弛后，节点数值（minDist数组）不在发生变化了
+  而终止。
+
+```java
+public class Main {
+
+    // Define an inner class Edge
+    static class Edge {
+        int from;
+        int to;
+        int val;
+
+        public Edge(int from, int to, int val) {
+            this.from = from;
+            this.to = to;
+            this.val = val;
+        }
+    }
+
+    public static void main(String[] args) {
+        // Input processing
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        List<List<Edge>> graph = new ArrayList<>();
+
+        for (int i = 0; i <= n; i++) {
+            graph.add(new ArrayList<>());
+        }
+
+        for (int i = 0; i < m; i++) {
+            int from = sc.nextInt();
+            int to = sc.nextInt();
+            int val = sc.nextInt();
+            graph.get(from).add(new Edge(from, to, val));
+        }
+
+        // Declare the minDist array to record the minimum distance form current node to the original node
+        int[] minDist = new int[n + 1];
+        Arrays.fill(minDist, Integer.MAX_VALUE);
+        minDist[1] = 0;
+
+        // Declare a queue to store the updated nodes instead of traversing all nodes each loop for more efficiency
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(1);
+
+        // Declare a boolean array to record if the current node is in the queue to optimise the processing
+        boolean[] isInQueue = new boolean[n + 1];
+
+        while (!queue.isEmpty()) {
+            int curNode = queue.poll();
+            isInQueue[curNode] = false; // Represents the current node is not in the queue after being polled
+            for (Edge edge : graph.get(curNode)) {
+                if (minDist[edge.to] > minDist[edge.from] + edge.val) { // Start relaxing the edge
+                    minDist[edge.to] = minDist[edge.from] + edge.val;
+                    if (!isInQueue[edge.to]) { // Don't add the node if it's already in the queue
+                        queue.offer(edge.to);
+                        isInQueue[edge.to] = true;
+                    }
+                }
+            }
+        }
+
+        // Outcome printing
+        if (minDist[n] == Integer.MAX_VALUE) {
+            System.out.println("unconnected");
+        } else {
+            System.out.println(minDist[n]);
+        }
+    }
+}
+```
+
 
 
 
