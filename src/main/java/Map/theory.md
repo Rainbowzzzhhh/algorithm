@@ -418,7 +418,6 @@ public class Main {
         }
     }
 }
-
 ```
 
 ## 队列优化算法（SPFA）
@@ -497,7 +496,303 @@ public class Main {
 }
 ```
 
+# [bellman_ford之判断负权回路](https://programmercarl.com/kamacoder/0095.%E5%9F%8E%E5%B8%82%E9%97%B4%E8%B4%A7%E7%89%A9%E8%BF%90%E8%BE%93II.html#%E6%80%9D%E8%B7%AF)
+
+- 图中可能出现负权回路。（正权因为会增加总权值，不会被选择）
+- *负权回路*是指回路的总权值为负，这样的回路使得通过反复经过回路中的道路，理论上可以无限地减少总成本或无限地增加总收益。
+- 有负权回路的情况下，一直都会有更短的最短路，所以 松弛 第n次，minDist数组 也会发生改变。
+
+```java
+public class Main {
+
+    // Define an inner class Edge
+    static class Edge {
+        int from;
+        int to;
+        int val;
+
+        public Edge(int from, int to, int val) {
+            this.from = from;
+            this.to = to;
+            this.val = val;
+        }
+    }
+
+    public static void main(String[] args) {
+        // Input processing
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        List<Edge> edges = new ArrayList<>();
+
+        for (int i = 0; i < m; i++) {
+            int from = sc.nextInt();
+            int to = sc.nextInt();
+            int val = sc.nextInt();
+            edges.add(new Edge(from, to, val));
+        }
+
+        // Represents the minimum distance from the current node to the original node
+        int[] minDist = new int[n + 1];
+
+        // Initialize the minDist array
+        Arrays.fill(minDist, Integer.MAX_VALUE);
+        minDist[1] = 0;
+
+        // Starts the loop to RELAX all edges n times to update minDist array
+        // (n次而不是n-1次是为了判断多relax一次后路径最小值是否稳定以判断是否存在负权环
+        boolean flag = false;
+        for (int i = 1; i <= n; i++) {
+            for (Edge edge : edges) {
+                if (i < n) {    //前n-1次放松边
+                    // Updates the minDist array
+                    if (minDist[edge.from] != Integer.MAX_VALUE && (minDist[edge.from] + edge.val) < minDist[edge.to]) {
+                        minDist[edge.to] = minDist[edge.from] + edge.val;
+                    }
+                } else {    //第n次检验是否稳定
+                    if (minDist[edge.from] != Integer.MAX_VALUE && (minDist[edge.from] + edge.val) < minDist[edge.to])
+                        flag = true;
+                }
+            }
+        }
+
+        // Outcome printing
+        if (flag) {
+            System.out.println("circle");
+        } else if (minDist[n] == Integer.MAX_VALUE) {
+            System.out.println("unconnected");
+        } else {
+            System.out.println(minDist[n]);
+        }
+    }
+}
+```
+
+# [bellman_ford之单源有限最短路](https://programmercarl.com/kamacoder/0096.%E5%9F%8E%E5%B8%82%E9%97%B4%E8%B4%A7%E7%89%A9%E8%BF%90%E8%BE%93III.html#%E6%80%9D%E8%B7%AF)
+
+- 最多*经过*k个城市（不包括起点）的条件下，而不是一定经过k个城市(bellman_ford,dj)，也可以经过的城市数量比k小，但要最短的路径。
+- 动归的思想分析：只要是从所有入度的点上获取最小minDist即可,因此松弛k+1次即可
+- 本题可以有负权回路，说明只要多做松弛，结果是会变的。
+- 本题要求最多经过k个节点，对松弛次数是有限制的。
+
+```java
+public class Main {
+    // 基于Bellman_for一般解法解决单源最短路径问题
+    // Define an inner class Edge
+    static class Edge {
+        int from;
+        int to;
+        int val;
+
+        public Edge(int from, int to, int val) {
+            this.from = from;
+            this.to = to;
+            this.val = val;
+        }
+    }
+
+    public static void main(String[] args) {
+        // Input processing
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+
+        List<Edge> graph = new ArrayList<>();
+
+        for (int i = 0; i < m; i++) {
+            int from = sc.nextInt();
+            int to = sc.nextInt();
+            int val = sc.nextInt();
+            graph.add(new Edge(from, to, val));
+        }
+
+        int src = sc.nextInt();
+        int dst = sc.nextInt();
+        int k = sc.nextInt();
+
+        int[] minDist = new int[n + 1];
+        int[] minDistCopy;
+
+        Arrays.fill(minDist, Integer.MAX_VALUE);
+        minDist[src] = 0;
+
+        for (int i = 0; i < k + 1; i++) { // Relax all edges k + 1 times
+            minDistCopy = Arrays.copyOf(minDist, n + 1);
+            for (Edge edge : graph) {
+                int from = edge.from;
+                int to = edge.to;
+                int val = edge.val;
+                // Use minDistCopy to calculate minDist
+                if (minDistCopy[from] != Integer.MAX_VALUE && minDist[to] > minDistCopy[from] + val) {
+                    minDist[to] = minDistCopy[from] + val;
+                }
+            }
+        }
+
+        // Output printing
+        if (minDist[dst] == Integer.MAX_VALUE) {
+            System.out.println("unreachable");
+        } else {
+            System.out.println(minDist[dst]);
+        }
+    }
+}
+```
+
+# [Floyd 算法精讲](https://programmercarl.com/kamacoder/0097.%E5%B0%8F%E6%98%8E%E9%80%9B%E5%85%AC%E5%9B%AD.html#%E6%80%9D%E8%B7%AF)
+
+## 多源最短路问题
+
+- Floyd 算法对边的权值正负没有要求，都可以处理。
+- 动态规划：grid[ i ] [ j ] [ k ] = min{grid[ i ] [ k ] [k-1] + grid[ k ] [ j ] [k-1], grid[ i ] [ j ] [k-1]}
+
+```java
+public class FloydBase {
+
+    // public static int MAX_VAL = Integer.MAX_VALUE;
+    public static int MAX_VAL = 10005; // 边的最大距离是10^4(不选用Integer.MAX_VALUE是为了避免相加导致数值溢出)
+
+    public static void main(String[] args) {
+        // 输入控制
+        Scanner sc = new Scanner(System.in);
+        System.out.println("1.输入N M");
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+
+        System.out.println("2.输入M条边");
+
+        // ① dp定义（grid[i][j][k] 节点i到节点j 可能经过节点K（k∈[1,n]））的最短路径
+        int[][][] grid = new int[n + 1][n + 1][n + 1];
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                for (int k = 0; k <= n; k++) {
+                    grid[i][j][k] = grid[j][i][k] = MAX_VAL; // 其余设置为最大值
+                }
+            }
+        }
+
+        // ② dp 推导：grid[i][j][k] = min{grid[i][k][k-1] + grid[k][j][k-1], grid[i][j][k-1]}
+        while (m-- > 0) {
+            int u = sc.nextInt();
+            int v = sc.nextInt();
+            int weight = sc.nextInt();
+            grid[u][v][0] = grid[v][u][0] = weight; // 初始化（处理k=0的情况） ③ dp初始化
+        }
+
+        // ④ dp推导：floyd 推导
+        for (int k = 1; k <= n; k++) {
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= n; j++) {
+                    grid[i][j][k] = Math.min(grid[i][k][k - 1] + grid[k][j][k - 1], grid[i][j][k - 1]);
+                    //grid[i][j] = Math.min(grid[i][j], grid[i][k] + grid[k][j]);
+                    //由于本层更新后仍旧是求最小，不会对结果发生影响，因此可以直接在原数组做赋值
+                    //本质上是利用
+                }
+            }
+        }
+
+        System.out.println("3.输入[起点-终点]计划个数");
+        int x = sc.nextInt();
+
+        System.out.println("4.输入每个起点src 终点dst");
+
+        while (x-- > 0) {
+            int src = sc.nextInt();
+            int dst = sc.nextInt();
+            // 根据floyd推导结果输出计划路径的最小距离
+            if (grid[src][dst][n] == MAX_VAL) {
+                System.out.println("-1");
+            } else {
+                System.out.println(grid[src][dst][n]);
+            }
+        }
+    }
+}
+```
+
+# [A * 算法精讲 （A star算法）](https://programmercarl.com/kamacoder/0126.%E9%AA%91%E5%A3%AB%E7%9A%84%E6%94%BB%E5%87%BBastar.html#%E6%80%9D%E8%B7%AF)
+
+- 启发式函数 要影响的就是队列里元素的排序！
+- 每个节点的权值为F，给出公式为：F = G + H
+- G：起点达到目前遍历节点的距离
+- H：目前遍历的节点到达终点的距离
+
+```java
+public class AStar {
+  @Data
+  static class Knight {
+    private int x, y;
+    private int g, h, f;
+
+    public void computeH(int b1, int b2) {
+      this.h = (x - b1) * (x - b1) + (y - b2) * (y - b2);
+    }
+
+    public void computeF() {
+      this.f = this.g + this.h;
+    }
+  }
+
+  static class MyComparator implements Comparator<Knight> {
+    @Override
+    public int compare(Knight o1, Knight o2) {
+      return Integer.compare(o1.f, o2.f);
+    }
+  }
+
+  int[][] dir = {{-2, -1}, {-2, 1}, {-1, 2}, {1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}};
+  int[][] moves = new int[1001][1001];
+  PriorityQueue<Knight> pq = new PriorityQueue<Knight>(new MyComparator());
+
+  public void aStar(int a1, int a2, int b1, int b2) {
+    Knight cur = new Knight(); //初始化
+    cur.setX(a1);
+    cur.setY(a2);
+    cur.setG(0);
+    cur.computeH(b1, b2);
+    cur.computeF();
+
+    Knight next = new Knight(); //初始化
+
+    pq.add(cur);
+    while (!pq.isEmpty()) {
+      cur = pq.poll();
+      if (cur.x == b1 && cur.y == b2) break;
+      for (int i = 0; i < 8; i++) {
+        next.setX(cur.getX() + dir[i][0]);
+        next.setY(cur.getY() + dir[i][1]);
+        if (next.x < 1 || next.x > 1000 || next.y < 1 || next.y > 1000) continue;
+        if (moves[next.getX()][next.getY()] != 0) {
+          moves[next.getX()][next.getY()] = moves[cur.getX()][cur.getY()] + 1;
+
+          //F = G + H
+          //G：起点达到目前遍历节点的距离
+          //H：目前遍历的节点到达终点的距离
+          next.setG(cur.getG() + 5);
+          next.computeH(b1, b2);
+          next.computeF();
+          pq.add(next);
+        }
+      }
+
+    }
+  }
+
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    free free = new free();
+    while (n-- > 0) {
+      int a1 = sc.nextInt();
+      int a2 = sc.nextInt();
+      int b1 = sc.nextInt();
+      int b2 = sc.nextInt();
+      free.aStar(a1, a2, b1, b2);
+      while (!free.pq.isEmpty()) free.pq.poll();
+      System.out.println(free.moves[b1][b2]);
+    }
 
 
-
-
+  }
+}
+```
