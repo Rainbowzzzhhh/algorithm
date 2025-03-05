@@ -9,11 +9,13 @@ import java.util.List;
  * @time 2025-03-04 11:40
  * @description ...
  */
+
 public class Solution15 {
     public List<List<Integer>> threeSum(int[] nums) {
         List<List<Integer>> res = new ArrayList<>();
         Arrays.sort(nums);
         int length = nums.length;
+
         for (int first = 0; first < length - 2; first++) {
             if (first > 0 && nums[first] == nums[first - 1]) {  //判断当前数字是否已经被遍历过
                 continue;
@@ -39,6 +41,7 @@ public class Solution15 {
                 }
             }
         }
+
         return res;
     }
 }
