@@ -5,7 +5,7 @@ package LeekCode;
  * @time 2025-03-07 10:26
  * @description ...
  */
-public class Solution55 {
+public class Solution45 {
     public int jump(int[] nums) {
         int length = nums.length;
         if (length == 1) return 0;
