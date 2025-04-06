@@ -118,7 +118,7 @@ public class Main {
             }
         }
 
-        if (result.size() == n) {
+        if (result.size() == n) {   //判断是否成环 如果我们发现结果集元素个数 不等于 图中节点个数，我们就可以认定图中一定有 有向环！
             for (int i = 0; i < result.size(); i++) {
                 System.out.print(result.get(i));
                 if (i < result.size() - 1) {
@@ -210,6 +210,89 @@ public class Main {
 }
 ```
 
+## [kruskal算法](https://programmercarl.com/kamacoder/0053.%E5%AF%BB%E5%AE%9D-Kruskal.html#kruskal%E7%AE%97%E6%B3%95%E7%B2%BE%E8%AE%B2)
+<u>kruscal的思路：</u>
+
+- 边的权值排序，因为要优先选最小的边加入到生成树里
+- 遍历排序后的边
+  - 如果边首尾的两个节点在同一个集合，说明如果连上这条边图中会出现环
+  - 如果边首尾的两个节点不在同一个集合，加入到最小生成树，并把两个节点加入同一个集合
+
+```java
+import java.util.*;
+
+class Edge {
+    int l, r, val;
+
+    Edge(int l, int r, int val) {
+        this.l = l;
+        this.r = r;
+        this.val = val;
+    }
+}
+
+public class Main {
+    private static int n = 10001;
+    private static int[] father = new int[n];
+
+    // 并查集初始化
+    public static void init() {
+        for (int i = 0; i < n; i++) {
+            father[i] = i;
+        }
+    }
+
+    // 并查集的查找操作
+    public static int find(int u) {
+        if (u == father[u]) return u;
+        return father[u] = find(father[u]);
+    }
+
+    // 并查集的加入集合
+    public static void join(int u, int v) {
+        u = find(u);
+        v = find(v);
+        if (u == v) return;
+        father[v] = u;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int v = scanner.nextInt();
+        int e = scanner.nextInt();
+        List<Edge> edges = new ArrayList<>();
+        int result_val = 0;
+
+        for (int i = 0; i < e; i++) {
+            int v1 = scanner.nextInt();
+            int v2 = scanner.nextInt();
+            int val = scanner.nextInt();
+            edges.add(new Edge(v1, v2, val));
+        }
+
+        // 执行Kruskal算法
+        //可以用优先队列优化
+        edges.sort(Comparator.comparingInt(edge -> edge.val));
+
+        // 并查集初始化
+        init();
+
+        // 从头开始遍历边
+        for (Edge edge : edges) {
+            int x = find(edge.l);
+            int y = find(edge.r);
+
+            if (x != y) {
+                result_val += edge.val;
+                join(x, y);
+            }
+        }
+        System.out.println(result_val);
+        scanner.close();
+    }
+}
+```
+
 # 最短路径算法：
 
 # [dijkstra算法：在有权图（权值非负数）中求从起点到其他节点的最短路径算法](https://programmercarl.com/kamacoder/0047.%E5%8F%82%E4%BC%9Adijkstra%E6%9C%B4%E7%B4%A0.html#%E6%80%9D%E8%B7%AF)
@@ -273,82 +356,100 @@ public class Main {
 }
 ```
 
-## 堆优化版
+## 堆优化版（使用邻接表）
 
 ```java
-class Edge {
-    int to;  // 邻接顶点
-    int val; // 边的权重
+import java.util.*;
 
-    Edge(int to, int val) {
-        this.to = to;
-        this.val = val;
-    }
+class Edge {
+  int to;  // 邻接顶点
+  int val; // 边的权重
+
+  Edge(int to, int val) {
+    this.to = to;
+    this.val = val;
+  }
 }
 
 class MyComparison implements Comparator<Pair<Integer, Integer>> {
-    @Override
-    public int compare(Pair<Integer, Integer> lhs, Pair<Integer, Integer> rhs) {
-        return Integer.compare(lhs.second, rhs.second);
-    }
+  @Override
+  public int compare(Pair<Integer, Integer> lhs, Pair<Integer, Integer> rhs) {
+    return Integer.compare(lhs.second, rhs.second);
+  }
 }
 
 class Pair<U, V> {
-    public final U first;
-    public final V second;
+  public final U first;
+  public final V second;
 
-    public Pair(U first, V second) {
-        this.first = first;
-        this.second = second;
-    }
+  public Pair(U first, V second) {
+    this.first = first;
+    this.second = second;
+  }
 }
 
 public class Main {
-    public static void main(String[] args) {
-        int start = 1;  // 起点
-        int end = n;    // 终点
+  public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
+    int n = scanner.nextInt();
+    int m = scanner.nextInt();
 
-        // 存储从源点到每个节点的最短距离
-        int[] minDist = new int[n + 1];
-        Arrays.fill(minDist, Integer.MAX_VALUE);
-
-        // 记录顶点是否被访问过
-        boolean[] visited = new boolean[n + 1];
-
-        // ！！！优先队列中存放 Pair<节点，源点到该节点的权值>，可以自动排序队列内 源点到该节点的权值，每次队列顶都是离源点最近的
-        PriorityQueue<Pair<Integer, Integer>> pq = new PriorityQueue<>(new MyComparison());
-
-        // 初始化队列，源点到源点的距离为0，所以初始为0
-        pq.add(new Pair<>(start, 0));
-
-        minDist[start] = 0;  // 起始点到自身的距离为0
-
-        while (!pq.isEmpty()) {
-            // 1. 第一步，选源点到哪个节点近且该节点未被访问过（通过优先级队列来实现）
-            // <节点， 源点到该节点的距离>
-            Pair<Integer, Integer> cur = pq.poll();
-
-            if (visited[cur.first]) continue;   //处理不是最近的但是被加入pq的pair
-
-            // 2. 第二步，该最近节点被标记访问过
-            visited[cur.first] = true;
-
-            // 3. 第三步，更新非访问节点到源点的距离（即更新minDist数组）
-            for (Edge edge : grid.get(cur.first)) { // 遍历 cur指向的所有节点，cur指向的节点为 edge
-                // cur指向的节点edge.to，这条边的权值为 edge.val
-                if (!visited[edge.to] && minDist[cur.first] + edge.val < minDist[edge.to]) { // 更新minDist
-                    minDist[edge.to] = minDist[cur.first] + edge.val;
-                    pq.add(new Pair<>(edge.to, minDist[edge.to]));
-                }
-            }
-        }
-
-        if (minDist[end] == Integer.MAX_VALUE) {
-            System.out.println(-1); // 不能到达终点
-        } else {
-            System.out.println(minDist[end]); // 到达终点最短路径
-        }
+    List<List<Edge>> grid = new ArrayList<>(n + 1);
+    for (int i = 0; i <= n; i++) {
+      grid.add(new ArrayList<>());
     }
+
+    for (int i = 0; i < m; i++) {
+      int p1 = scanner.nextInt();
+      int p2 = scanner.nextInt();
+      int val = scanner.nextInt();
+      grid.get(p1).add(new Edge(p2, val));
+    }
+
+    int start = 1;  // 起点
+    int end = n;    // 终点
+
+    // 存储从源点到每个节点的最短距离
+    int[] minDist = new int[n + 1];
+    Arrays.fill(minDist, Integer.MAX_VALUE);
+
+    // 记录顶点是否被访问过
+    boolean[] visited = new boolean[n + 1];
+
+    // 优先队列中存放 Pair<节点，源点到该节点的权值>
+    PriorityQueue<Pair<Integer, Integer>> pq = new PriorityQueue<>(new MyComparison());
+
+    // 初始化队列，源点到源点的距离为0，所以初始为0
+    pq.add(new Pair<>(start, 0));
+
+    minDist[start] = 0;  // 起始点到自身的距离为0
+
+    while (!pq.isEmpty()) {
+      // 1. 第一步，选源点到哪个节点近且该节点未被访问过（通过优先级队列来实现）
+      // <节点， 源点到该节点的距离>
+      Pair<Integer, Integer> cur = pq.poll();
+
+      if (visited[cur.first]) continue;
+
+      // 2. 第二步，该最近节点被标记访问过
+      visited[cur.first] = true;
+
+      // 3. 第三步，更新非访问节点到源点的距离（即更新minDist数组）
+      for (Edge edge : grid.get(cur.first)) { // 遍历 cur指向的节点，cur指向的节点为 edge
+        // cur指向的节点edge.to，这条边的权值为 edge.val
+        if (!visited[edge.to] && minDist[cur.first] + edge.val < minDist[edge.to]) { // 更新minDist
+          minDist[edge.to] = minDist[cur.first] + edge.val;
+          pq.add(new Pair<>(edge.to, minDist[edge.to]));
+        }
+      }
+    }
+
+    if (minDist[end] == Integer.MAX_VALUE) {
+      System.out.println(-1); // 不能到达终点
+    } else {
+      System.out.println(minDist[end]); // 到达终点最短路径
+    }
+  }
 }
 ```
 
